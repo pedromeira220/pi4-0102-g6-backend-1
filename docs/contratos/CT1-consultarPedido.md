@@ -21,7 +21,10 @@
 | senha | inteiro | sim | 42 |
 | etapa | um de: recebido, em_preparo, pronto, encerrado | sim | em_preparo |
 | estimativaMinutos | inteiro | não (vem só nas etapas recebido e em_preparo) | 8 |
+| posicaoNaFila | inteiro | não (vem só nas etapas recebido e em_preparo) | 3 |
 | atualizadoEm | data e hora | sim | 2026-10-13T19:20:00 |
+
+A posição é 1 mais o número de pedidos em `recebido` ou `em_preparo` com `criado_em` anterior. O pedido que espera há mais tempo é o 1. Pronto e encerrado saem da fila e vêm sem posição. O Backend 1 calcula a posição na hora da consulta, a partir da tabela pedido (CT2).
 
 ## Erros
 

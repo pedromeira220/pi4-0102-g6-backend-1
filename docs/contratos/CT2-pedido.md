@@ -26,3 +26,7 @@ Os campos gravados são os mesmos campos lidos.
 |---|---|
 | Já existe pedido com a mesma senha | O banco recusa a gravação |
 | A etapa gravada não está na lista | O banco recusa a gravação |
+
+## Posição na fila
+
+Não há coluna para a posição. O Backend 1 calcula a partir de `etapa` e `criado_em`: a posição é 1 mais o número de pedidos em `recebido` ou `em_preparo` com `criado_em` anterior. O pedido que espera há mais tempo é o 1. Pronto e encerrado saem da fila e vêm sem posição. Assim, quando um pedido sai da fila, a posição dos que estão atrás dele muda sem nenhuma gravação extra.
