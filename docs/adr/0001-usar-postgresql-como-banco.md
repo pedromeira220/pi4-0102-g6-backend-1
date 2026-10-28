@@ -2,7 +2,7 @@
 
 **Status:** aceito
 
-**Contexto:** O serviço HTTP guarda os pedidos: a senha, a etapa atual e o horário de cada mudança de etapa. A fila de demonstração cria um pedido novo a cada 30 s e avança os existentes sozinha, então o banco recebe escrita contínua durante a apresentação. O sistema inteiro sobe com `docker compose up` num clone limpo (entregável E6). O modelo de dados é pequeno e tem campos fixos.
+**Contexto:** O serviço HTTP guarda os pedidos: a senha, a etapa atual e o horário da última mudança de etapa. A fila de demonstração cria um pedido novo a cada 30 s e avança os existentes sozinha, então o banco recebe escrita contínua durante a apresentação. O sistema inteiro sobe com `docker compose up` num clone limpo (entregável E6). O modelo de dados é pequeno e tem campos fixos.
 
 **Decisão:** Usar PostgreSQL, rodando em um contêiner próprio no Docker Compose, com os dados em um volume.
 
