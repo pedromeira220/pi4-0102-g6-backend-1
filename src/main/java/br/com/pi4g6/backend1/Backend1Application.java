@@ -1,0 +1,15 @@
+package br.com.pi4g6.backend1;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
+
+@SpringBootApplication
+@EnableScheduling
+public class Backend1Application {
+
+	public static void main(String[] args) {
+		SpringApplication.run(Backend1Application.class, args);
+	}
+
+}
