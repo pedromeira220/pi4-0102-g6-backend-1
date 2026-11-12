@@ -1,5 +1,6 @@
 package br.com.pi4g6.backend1;
 
+import br.com.pi4g6.comunicado.EtapaGravada;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;

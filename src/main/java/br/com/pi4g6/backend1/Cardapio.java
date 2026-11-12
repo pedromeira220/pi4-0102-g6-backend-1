@@ -4,15 +4,15 @@ import java.util.Arrays;
 import java.util.List;
 
 public enum Cardapio {
-    BIG_MAC(5, true),
-    QUARTEIRAO_COM_QUEIJO(6, true),
-    MCCHICKEN(5, true),
-    CHEESEBURGER(3, true),
-    MCNUGGETS(4, true),
-    MCFRITAS(3, false),
-    MCFLURRY(2, false),
-    TORTA_DE_MACA(2, false),
-    CASQUINHA(1, false),
+    HAMBURGUER_DUPLO(5, true),
+    HAMBURGUER_COM_QUEIJO(6, true),
+    SANDUICHE_DE_FRANGO(5, true),
+    HAMBURGUER_SIMPLES(3, true),
+    PORCAO_DE_FRANGO(4, true),
+    BATATA_FRITA(3, false),
+    SORVETE_COM_CALDA(2, false),
+    TORTA(2, false),
+    SORVETE_SIMPLES(1, false),
     REFRIGERANTE(1, false),
     CAFE(1, false);
 
