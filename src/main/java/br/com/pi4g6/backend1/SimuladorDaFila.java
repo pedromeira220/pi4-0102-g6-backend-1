@@ -14,10 +14,12 @@ public class SimuladorDaFila {
 
     private final PedidoRepository pedidos;
     private final AvisoDeEtapa avisos;
+    private final FilaDePedidos fila;
 
-    public SimuladorDaFila(PedidoRepository pedidos, AvisoDeEtapa avisos) {
+    public SimuladorDaFila(PedidoRepository pedidos, AvisoDeEtapa avisos, FilaDePedidos fila) {
         this.pedidos = pedidos;
         this.avisos = avisos;
+        this.fila = fila;
     }
 
     @Scheduled(fixedRateString = "${demo.intervaloMs:30000}")
@@ -52,15 +54,11 @@ public class SimuladorDaFila {
     }
 
     private EtapaGravada montarAviso(Pedido pedido, LocalDateTime agora) {
-        Integer posicaoNaFila = null;
-        if (pedido.getEtapa().estaNaFila()) {
-            posicaoNaFila = pedidos.contarNaFilaCriadosAntesDe(pedido.getCriadoEm()) + 1;
-        }
         return new EtapaGravada(
                 pedido.getSenha(),
                 pedido.getEtapa().valor(),
-                pedido.estimativaMinutos(agora),
-                posicaoNaFila,
+                fila.estimativaMinutosDe(pedido, agora),
+                fila.posicaoDe(pedido),
                 pedido.getAtualizadoEm());
     }
 }

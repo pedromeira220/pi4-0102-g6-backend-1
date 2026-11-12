@@ -26,6 +26,8 @@
 
 A posição é 1 mais o número de pedidos em `recebido` ou `em_preparo` com `criado_em` anterior. O pedido que espera há mais tempo é o 1. Pronto e encerrado saem da fila e vêm sem posição. O Backend 1 calcula a posição na hora da consulta, a partir da tabela pedido (CT2).
 
+A estimativa de minutos é o tempo até o pedido ficar pronto, contado do instante da consulta. O Backend 1 a calcula a partir dos itens do pedido e do que falta preparar de quem está à frente na fila, e também não a guarda em coluna nenhuma. Pronto e encerrado vêm sem estimativa. O cálculo está descrito em CT2.
+
 ## Erros
 
 | Quando | O que volta |

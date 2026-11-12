@@ -32,4 +32,13 @@ public interface PedidoRepository extends JpaRepository<Pedido, Integer> {
 
     @Query("select p from Pedido p where p.etapa <> br.com.pi4g6.backend1.Pedido$Etapa.ENCERRADO order by p.criadoEm")
     List<Pedido> naoEncerradosPorOrdemDeChegada();
+
+    @Query("""
+            select p from Pedido p
+            where p.etapa in (br.com.pi4g6.backend1.Pedido$Etapa.RECEBIDO,
+                              br.com.pi4g6.backend1.Pedido$Etapa.EM_PREPARO)
+              and p.criadoEm < :criadoEm
+            order by p.criadoEm
+            """)
+    List<Pedido> naFilaCriadosAntesDe(@Param("criadoEm") LocalDateTime criadoEm);
 }

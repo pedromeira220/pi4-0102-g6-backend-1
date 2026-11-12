@@ -18,9 +18,11 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 public class PedidoController {
 
     private final PedidoRepository pedidos;
+    private final FilaDePedidos fila;
 
-    public PedidoController(PedidoRepository pedidos) {
+    public PedidoController(PedidoRepository pedidos, FilaDePedidos fila) {
         this.pedidos = pedidos;
+        this.fila = fila;
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -47,15 +49,11 @@ public class PedidoController {
     }
 
     PedidoResposta montarResposta(Pedido pedido, LocalDateTime agora) {
-        Integer posicaoNaFila = null;
-        if (pedido.getEtapa().estaNaFila()) {
-            posicaoNaFila = pedidos.contarNaFilaCriadosAntesDe(pedido.getCriadoEm()) + 1;
-        }
         return new PedidoResposta(
                 pedido.getSenha(),
                 pedido.getEtapa(),
-                pedido.estimativaMinutos(agora),
-                posicaoNaFila,
+                fila.estimativaMinutosDe(pedido, agora),
+                fila.posicaoDe(pedido),
                 pedido.getAtualizadoEm());
     }
 
