@@ -1,0 +1,52 @@
+# H01.4: compila e roda os testes JUnit a cada push e a cada PR.
+# Teste quebrado marca o commit como falho.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+
+    # Os testes leem e gravam no PostgreSQL, então o banco sobe junto, igual ao do compose.
+    services:
+      db:
+        image: postgres:17.6-alpine
+        env:
+          POSTGRES_DB: pi4
+          POSTGRES_USER: pi4
+          POSTGRES_PASSWORD: pi4
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U pi4 -d pi4"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    env:
+      POSTGRES_HOST: localhost
+      POSTGRES_DB: pi4
+      POSTGRES_USER: pi4
+      POSTGRES_PASSWORD: pi4
+      PGPASSWORD: pi4
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cria a tabela pedido (db/init, o mesmo do compose)
+        run: |
+          for arquivo in db/init/*.sql; do
+            psql -h localhost -U pi4 -d pi4 -v ON_ERROR_STOP=1 -f "$arquivo"
+          done
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Compila e roda os testes
+        run: sh mvnw -B verify
