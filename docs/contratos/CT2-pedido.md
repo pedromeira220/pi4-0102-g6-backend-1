@@ -20,6 +20,32 @@ Os campos gravados são os mesmos campos lidos.
 | criado_em | data e hora | sim | 2026-10-13T19:05:00 |
 | atualizado_em | data e hora | sim | 2026-10-13T19:20:00 |
 
+## Estimativa de minutos
+
+Não há coluna para a estimativa, como não há para a posição. O Backend 1 a calcula na
+hora da consulta, em três passos.
+
+**A comanda.** A tabela não guarda itens, então o Backend 1 sorteia uma comanda a partir
+de `senha` e `criado_em`, que não mudam depois do pedido nascer. O mesmo pedido devolve
+sempre a mesma comanda, pedidos diferentes recebem comandas diferentes, e uma nova
+rodada da demonstração não repete a anterior. Sem isso o número saltaria a cada vez que
+o cliente recarregasse a tela.
+
+**O preparo.** Cada item do cardápio tem um tempo médio, e o preparo do pedido é a soma
+dos tempos dos seus itens. Os valores estão no enum `Cardapio`.
+
+**A fila.** A espera não é só o preparo do próprio pedido: é também o que falta preparar
+de quem chegou antes. A cozinha trabalha em paralelo, com um número de postos definido
+em `cozinha.postos`, e cada pedido da frente ocupa o posto que liberar primeiro. A espera
+é o tempo até sobrar um posto, mais o preparo do próprio pedido, com piso de um minuto.
+
+Com um posto a cozinha fica em série e a espera é a soma de todos os que estão à frente.
+Com posto sobrando, o pedido não espera por ninguém.
+
+Isso é um modelo para a demonstração, não um cadastro de itens. Se o sistema passar a
+ter itens de verdade, eles entram como tabela e este cálculo passa a ler dados em vez de
+sorteá-los.
+
 ## Erros
 
 | Quando | O que volta |

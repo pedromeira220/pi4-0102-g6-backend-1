@@ -5,6 +5,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import br.com.pi4g6.backend1.Pedido.Etapa;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
@@ -57,24 +60,55 @@ class PedidoContratoTest {
     }
 
     @Test
-    void estimativaCaiComOTempo() {
+    void comandaEhEstavelParaOMesmoPedido() {
         Pedido pedido = new Pedido(42, INICIO);
-        assertThat(pedido.estimativaMinutos(INICIO)).isEqualTo(15);
-        assertThat(pedido.estimativaMinutos(INICIO.plusMinutes(7))).isEqualTo(8);
+        assertThat(pedido.comanda()).isEqualTo(pedido.comanda());
+        assertThat(pedido.minutosDePreparo()).isEqualTo(pedido.minutosDePreparo());
     }
 
     @Test
-    void estimativaTemPisoDeUmMinuto() {
-        Pedido pedido = new Pedido(42, INICIO);
-        assertThat(pedido.estimativaMinutos(INICIO.plusMinutes(100))).isEqualTo(1);
-        assertThat(pedido.estimativaMinutos(INICIO.plusDays(30))).isEqualTo(1);
+    void comandaVariaEntrePedidos() {
+        Set<Integer> preparos = new HashSet<>();
+        for (int senha = 1; senha <= 30; senha++) {
+            preparos.add(new Pedido(senha, INICIO).minutosDePreparo());
+        }
+        assertThat(preparos).hasSizeGreaterThan(3);
     }
 
     @Test
-    void estimativaNaoPassaDoNominalComRelogioAtrasado() {
-        Pedido pedido = new Pedido(42, INICIO);
-        assertThat(pedido.estimativaMinutos(INICIO.minusMinutes(50))).isEqualTo(15);
+    void comandaVariaEntreRodadasMesmoComAMesmaSenha() {
+        Pedido deHoje = new Pedido(1, INICIO);
+        Pedido deAmanha = new Pedido(1, INICIO.plusDays(1));
+        assertThat(deHoje.comanda()).isNotEqualTo(deAmanha.comanda());
     }
+
+    @Test
+    void comandaTemUmPrincipalEAteTresAcompanhamentos() {
+        for (int senha = 1; senha <= 50; senha++) {
+            List<Cardapio> comanda = new Pedido(senha, INICIO).comanda();
+            assertThat(comanda).hasSizeBetween(1, 4);
+            assertThat(comanda.get(0).ehPrincipal()).isTrue();
+            assertThat(comanda.subList(1, comanda.size()))
+                    .allMatch(item -> !item.ehPrincipal());
+        }
+    }
+
+    @Test
+    void preparoEhASomaDosItensDaComanda() {
+        Pedido pedido = new Pedido(42, INICIO);
+        int somaManual = pedido.comanda().stream().mapToInt(Cardapio::minutosDePreparo).sum();
+        assertThat(pedido.minutosDePreparo()).isEqualTo(somaManual);
+    }
+
+    @Test
+    void todoItemDoCardapioLevaAlgumTempo() {
+        for (Cardapio item : Cardapio.values()) {
+            assertThat(item.minutosDePreparo()).isPositive();
+        }
+    }
+
+
+
 
     @Test
     void respostaNaFilaTrazEstimativaEPosicao() throws Exception {
