@@ -2,6 +2,7 @@ package br.com.pi4g6.backend1;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
@@ -19,10 +20,12 @@ public class PedidoController {
 
     private final PedidoRepository pedidos;
     private final FilaDePedidos fila;
+    private final SimuladorDaFila simulador;
 
-    public PedidoController(PedidoRepository pedidos, FilaDePedidos fila) {
+    public PedidoController(PedidoRepository pedidos, FilaDePedidos fila, SimuladorDaFila simulador) {
         this.pedidos = pedidos;
         this.fila = fila;
+        this.simulador = simulador;
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -46,6 +49,62 @@ public class PedidoController {
     public ResponseEntity<Void> reiniciarDemo() {
         pedidos.deleteAll();
         return ResponseEntity.noContent().build();
+    }
+
+    /** Um pedido no painel da cozinha: as etapas e os horários de cada passagem. */
+    public record PedidoNoPainel(
+            int senha,
+            Pedido.Etapa etapa,
+            int segundosDePreparo,
+            LocalDateTime criadoEm,
+            LocalDateTime inicioPreparo,
+            LocalDateTime prontoEm) {
+    }
+
+    /** O painel da cozinha: todos os pedidos desde o último reinício e o que o simulador está usando. */
+    public record Painel(
+            LocalDateTime agora,
+            int cozinheiros,
+            String ritmo,
+            int chegadaMinSeg,
+            int chegadaMaxSeg,
+            int segundosPorMinuto,
+            int toleranciaProntoSeg,
+            List<PedidoNoPainel> pedidos) {
+    }
+
+    @GetMapping("/painel")
+    public Painel painel() {
+        SimuladorDaFila.Ritmo ritmo = simulador.ritmo();
+        int segundosPorMinuto = fila.segundosPorMinuto();
+        List<PedidoNoPainel> lista = pedidos.findAllByOrderByCriadoEm().stream()
+                .map(p -> new PedidoNoPainel(
+                        p.getSenha(),
+                        p.getEtapa(),
+                        p.segundosDePreparo(segundosPorMinuto),
+                        p.getCriadoEm(),
+                        p.getEtapa() == Pedido.Etapa.RECEBIDO ? null : p.inicioDoPreparo(),
+                        p.getProntoEm()))
+                .toList();
+        return new Painel(
+                LocalDateTime.now(),
+                fila.postosDaCozinha(),
+                ritmo.name().toLowerCase(),
+                ritmo.chegadaMinSeg,
+                ritmo.chegadaMaxSeg,
+                segundosPorMinuto,
+                simulador.toleranciaProntoSeg(),
+                lista);
+    }
+
+    @PostMapping("/demo/ritmo/{ritmo}")
+    public ResponseEntity<?> mudarRitmo(@PathVariable String ritmo) {
+        try {
+            simulador.mudarRitmo(SimuladorDaFila.Ritmo.valueOf(ritmo.toUpperCase()));
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException desconhecido) {
+            return erro(HttpStatus.BAD_REQUEST, "RITMO_INVALIDO");
+        }
     }
 
     PedidoResposta montarResposta(Pedido pedido, LocalDateTime agora) {

@@ -5,5 +5,7 @@ CREATE TABLE pedido (
     senha         integer   NOT NULL UNIQUE,
     etapa         text      NOT NULL CHECK (etapa IN ('recebido', 'em_preparo', 'pronto', 'encerrado')),
     criado_em     timestamp NOT NULL DEFAULT now(),
-    atualizado_em timestamp NOT NULL DEFAULT now()
+    atualizado_em timestamp NOT NULL DEFAULT now(),
+    inicio_preparo timestamp,  -- quando um cozinheiro pegou o pedido
+    pronto_em     timestamp   -- quando ficou pronto
 );

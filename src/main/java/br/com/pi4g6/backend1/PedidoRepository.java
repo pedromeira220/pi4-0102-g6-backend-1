@@ -11,6 +11,10 @@ public interface PedidoRepository extends JpaRepository<Pedido, Integer> {
 
     Optional<Pedido> findBySenha(int senha);
 
+    List<Pedido> findByEtapaOrderByCriadoEm(Pedido.Etapa etapa);
+
+    List<Pedido> findAllByOrderByCriadoEm();
+
     @Query("""
             select count(p) from Pedido p
             where p.etapa in (br.com.pi4g6.backend1.Pedido$Etapa.RECEBIDO,

@@ -73,6 +73,10 @@ public class Pedido {
 
     private LocalDateTime atualizadoEm;
 
+    private LocalDateTime inicioPreparo;
+
+    private LocalDateTime prontoEm;
+
     protected Pedido() {
     }
 
@@ -101,6 +105,42 @@ public class Pedido {
 
     public LocalDateTime getAtualizadoEm() {
         return atualizadoEm;
+    }
+
+    public LocalDateTime getInicioPreparo() {
+        return inicioPreparo;
+    }
+
+    public LocalDateTime getProntoEm() {
+        return prontoEm;
+    }
+
+    /** Um cozinheiro pegou o pedido. */
+    public void iniciarPreparo(LocalDateTime agora) {
+        this.etapa = Etapa.EM_PREPARO;
+        this.inicioPreparo = agora;
+        this.atualizadoEm = agora;
+    }
+
+    public void ficarPronto(LocalDateTime agora) {
+        this.etapa = Etapa.PRONTO;
+        this.prontoEm = agora;
+        this.atualizadoEm = agora;
+    }
+
+    public void encerrar(LocalDateTime agora) {
+        this.etapa = Etapa.ENCERRADO;
+        this.atualizadoEm = agora;
+    }
+
+    /** Quando o preparo começou; pedidos gravados antes desta coluna existir caem no atualizadoEm. */
+    public LocalDateTime inicioDoPreparo() {
+        return inicioPreparo != null ? inicioPreparo : atualizadoEm;
+    }
+
+    /** Tempo de preparo na demo: cada minuto do cardápio vale {@code segundosPorMinuto} segundos. */
+    public int segundosDePreparo(int segundosPorMinuto) {
+        return minutosDePreparo() * segundosPorMinuto;
     }
 
     public boolean avancar(LocalDateTime agora) {
