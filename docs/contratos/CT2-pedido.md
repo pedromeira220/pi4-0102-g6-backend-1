@@ -19,6 +19,10 @@ Os campos gravados são os mesmos campos lidos.
 | etapa | um de: recebido, em_preparo, pronto, encerrado | sim | em_preparo |
 | criado_em | data e hora | sim | 2026-10-13T19:05:00 |
 | atualizado_em | data e hora | sim | 2026-10-13T19:20:00 |
+| inicio_preparo | data e hora | não (vazio enquanto o pedido está em recebido) | 2026-10-13T19:08:00 |
+| pronto_em | data e hora | não (vazio até o pedido ficar pronto) | 2026-10-13T19:14:00 |
+
+`inicio_preparo` e `pronto_em` entraram em novembro, junto com o simulador por cozinheiros (ADR 0002): o simulador usa `inicio_preparo` para saber quando o preparo acaba e `pronto_em` para encerrar o pedido depois da tolerância. O painel da cozinha (CT7) mostra os dois.
 
 ## Estimativa de minutos
 
